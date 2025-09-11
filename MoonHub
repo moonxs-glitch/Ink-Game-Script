@@ -3,7 +3,7 @@ local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
--- Create Window
+-- Window
 local Window = Library:CreateWindow({
     Title = "Moon Hub",
     Footer = "version: tester",
@@ -12,52 +12,99 @@ local Window = Library:CreateWindow({
 })
 
 -- Main Tab
-local MainTab = Window:AddTab("Main")
+local Tabs = {
+    Main = Window:AddTab("Main"),
+    ["UI Settings"] = Window:AddTab("UI Settings")
+}
 
--- Left and Right Columns
-local leftFrame = Instance.new("Frame")
-leftFrame.Size = UDim2.new(0.5, 0, 1, 0)
-leftFrame.Position = UDim2.new(0, 0, 0, 0)
-leftFrame.BackgroundTransparency = 1
-leftFrame.Parent = MainTab.MainFrame
+-- ======================
+-- Left Column Groupboxes
+-- ======================
+local RLGLGroup = Tabs.Main:AddLeftGroupbox("Red Light Green Light")
+local DalgonaGroup = Tabs.Main:AddLeftGroupbox("Auto Dalgona")
+local JumpRopeGroup = Tabs.Main:AddLeftGroupbox("Jump Rope")
 
-local rightFrame = Instance.new("Frame")
-rightFrame.Size = UDim2.new(0.5, 0, 1, 0)
-rightFrame.Position = UDim2.new(0.5, 0, 0, 0)
-rightFrame.BackgroundTransparency = 1
-rightFrame.Parent = MainTab.MainFrame
+-- ======================
+-- Right Column Groupboxes
+-- ======================
+local LightsOutGroup = Tabs.Main:AddRightGroupbox("Lights Out")
+local HideSeekGroup = Tabs.Main:AddRightGroupbox("Hide & Seek")
 
--- Layouts
-local leftLayout = Instance.new("UIListLayout")
-leftLayout.Parent = leftFrame
-leftLayout.Padding = UDim.new(0, 10)
+-- ======================
+-- Example: adding buttons/toggles
+-- ======================
+-- Example for RLGL group (you can remove or add more)
+RLGLGroup:AddToggle("TestToggle", {
+    Text = "Example Toggle",
+    Default = false,
+    Callback = function(value)
+        print("RLGL TestToggle:", value)
+    end
+})
 
-local rightLayout = Instance.new("UIListLayout")
-rightLayout.Parent = rightFrame
-rightLayout.Padding = UDim.new(0, 10)
+RLGLGroup:AddButton("Example Button", function()
+    print("RLGL Button clicked")
+end)
 
--- Helper to create groupboxes
-local function createGroupbox(parent, title)
-    local groupbox = Instance.new("Frame")
-    groupbox.Size = UDim2.new(1, -20, 0, 100)
-    groupbox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    groupbox.Parent = parent
+-- ======================
+-- UI Settings tab
+-- ======================
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 25)
-    label.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    label.Text = title
-    label.TextColor3 = Color3.new(1,1,1)
-    label.Parent = groupbox
+MenuGroup:AddToggle("KeybindMenuOpen", {
+    Default = Library.KeybindFrame.Visible,
+    Text = "Open Keybind Menu",
+    Callback = function(value)
+        Library.KeybindFrame.Visible = value
+    end
+})
 
-    return groupbox
-end
+MenuGroup:AddToggle("ShowCustomCursor", {
+    Text = "Custom Cursor",
+    Default = true,
+    Callback = function(Value)
+        Library.ShowCustomCursor = Value
+    end
+})
 
--- Left Column
-local RLGLGroup = createGroupbox(leftFrame, "Red Light Green Light")
-local DalgonaGroup = createGroupbox(leftFrame, "Auto Dalgona")
-local JumpRopeGroup = createGroupbox(leftFrame, "Jump Rope")
+MenuGroup:AddDropdown("NotificationSide", {
+    Values = { "Left", "Right" },
+    Default = "Right",
+    Text = "Notification Side",
+    Callback = function(Value)
+        Library:SetNotifySide(Value)
+    end
+})
 
--- Right Column
-local LightsOutGroup = createGroupbox(rightFrame, "Lights Out")
-local HideSeekGroup = createGroupbox(rightFrame, "Hide & Seek")
+MenuGroup:AddDropdown("DPIDropdown", {
+    Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+    Default = "100%",
+    Text = "DPI Scale",
+    Callback = function(Value)
+        Value = Value:gsub("%%", "")
+        local DPI = tonumber(Value)
+        Library:SetDPIScale(DPI)
+    end
+})
+
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+    :AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+    Library:Unload()
+end)
+
+Library.ToggleKeybind = Library.Options.MenuKeybind
+
+-- ======================
+-- Theme & SaveManager
+-- ======================
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+ThemeManager:SetFolder("Moon Hub")
+SaveManager:SetFolder("Moon Hub/Other Game")
+SaveManager:SetSubFolder(tostring(game.PlaceId))
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
