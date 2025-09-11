@@ -23,24 +23,24 @@ local Tabs = {
 	UISettings = Window:AddTab("UI Settings"),
 }
 
--- Red Light Green Light
+-- Red Light Green Light (Left)
 local RLGLGroup = Tabs.Main:AddLeftGroupbox("Red Light Green Light", "moon")
 -- Insert RLGL logic here
 
--- Auto Dalgona
+-- Auto Dalgona (Left)
 local DalgonaGroup = Tabs.Main:AddLeftGroupbox("Auto Dalgona", "moon")
 -- Insert Auto Dalgona logic here
 
--- Jump Rope
+-- Jump Rope (Left)
 local JumpRopeGroup = Tabs.Main:AddLeftGroupbox("Jump Rope", "moon")
 -- Insert Jump Rope logic here
 
--- Lights Out
-local LightsOutGroup = Tabs.Main:AddLeftGroupbox("Lights Out", "moon")
+-- Lights Out (Right)
+local LightsOutGroup = Tabs.Main:AddRightGroupbox("Lights Out", "moon")
 -- Insert Lights Out logic here
 
--- Hide & Seek
-local HideSeekGroup = Tabs.Main:AddLeftGroupbox("Hide & Seek", "moon")
+-- Hide & Seek (Right)
+local HideSeekGroup = Tabs.Main:AddRightGroupbox("Hide & Seek", "moon")
 -- Insert Hide & Seek logic here
 
 -- UI Settings
