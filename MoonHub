@@ -23,28 +23,21 @@ local Tabs = {
 	UISettings = Window:AddTab("UI Settings"),
 }
 
--- Red Light Green Light (Left)
-local RLGLGroup = Tabs.Main:AddLeftGroupbox("Red Light Green Light", "moon")
--- Insert RLGL logic here
+-- Create Left and Right Columns
+local MainLeftColumn = Tabs.Main:AddLeftGroupbox("Left Column")
+local MainRightColumn = Tabs.Main:AddRightGroupbox("Right Column")
 
--- Auto Dalgona (Left)
-local DalgonaGroup = Tabs.Main:AddLeftGroupbox("Auto Dalgona", "moon")
--- Insert Auto Dalgona logic here
+-- Left Column Groupboxes
+local RLGLGroup = MainLeftColumn:AddGroupbox("Red Light Green Light") -- RLGL
+local DalgonaGroup = MainLeftColumn:AddGroupbox("Auto Dalgona")       -- Auto Dalgona
+local JumpRopeGroup = MainLeftColumn:AddGroupbox("Jump Rope")         -- Jump Rope
 
--- Jump Rope (Left)
-local JumpRopeGroup = Tabs.Main:AddLeftGroupbox("Jump Rope", "moon")
--- Insert Jump Rope logic here
-
--- Lights Out (Right)
-local LightsOutGroup = Tabs.Main:AddRightGroupbox("Lights Out", "moon")
--- Insert Lights Out logic here
-
--- Hide & Seek (Right)
-local HideSeekGroup = Tabs.Main:AddRightGroupbox("Hide & Seek", "moon")
--- Insert Hide & Seek logic here
+-- Right Column Groupboxes
+local LightsOutGroup = MainRightColumn:AddGroupbox("Lights Out")      -- Lights Out
+local HideSeekGroup = MainRightColumn:AddGroupbox("Hide & Seek")      -- Hide & Seek
 
 -- UI Settings
-local MenuGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench")
+local MenuGroup = Tabs.UISettings:AddLeftGroupbox("Menu")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
