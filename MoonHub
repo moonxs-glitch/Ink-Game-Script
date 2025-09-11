@@ -9,145 +9,125 @@ local Toggles = Library.Toggles
 Library.ForceCheckbox = false
 Library.ShowToggleFrameInKeybinds = true
 
--- =========================
--- CreateWindow with your custom scheme
--- =========================
 local Window = Library:CreateWindow({
-    Title = "Moon Hub",
-    Footer = "version: tester",
-    Icon = 84833945573142,
-    NotifySide = "Right",
-    ToggleKeybind = Enum.KeyCode.LeftAlt,
-    Font = Enum.Font.Fantasy,
-    ShowCustomCursor = true,
-
-    MinSize = Vector2.new(480, 360),
-    DPIScale = 1,
-    CornerRadius = 4,
-    IsLightTheme = false,
-
-    Scheme = {
-        BackgroundColor = Color3.fromRGB(15, 15, 15),
-        MainColor = Color3.fromRGB(25, 25, 25),
-        AccentColor = Color3.fromRGB(125, 85, 255),
-        OutlineColor = Color3.fromRGB(40, 40, 40),
-        FontColor = Color3.new(1, 1, 1),
-        Font = Font.fromEnum(Enum.Font.Code),
-
-        Red = Color3.fromRGB(255, 50, 50),
-        Dark = Color3.new(0, 0, 0),
-        White = Color3.new(1, 1, 1),
-    },
+	Title = "Moon Hub",
+	Footer = "version: tester",
+	Icon = 5012126105,
+	IconSize = UDim2.fromOffset(20, 20),
+	NotifySide = "Right",
+	ToggleKeybind = Enum.KeyCode.LeftAlt,
+	Font = Enum.Font.Fantasy,
+	ShowCustomCursor = true,
 })
 
--- =========================
--- Tabs
--- =========================
 local Tabs = {
-    Main = Window:AddTab("Main", "user", "Home"),
-    ["UI Settings"] = Window:AddTab("UI Settings", "settings", "Configure your settings"),
+	Main = Window:AddTab("Main", "user", "Home"),
+	["UI Settings"] = Window:AddTab("UI Settings", "settings", "Configure your settings"),
 }
 
--- =========================
--- Example groupbox
--- =========================
-local MainGroup = Tabs.Main:AddLeftGroupbox("Example Groupbox", "moon")
+local MainGroup = Tabs.Main:AddLeftGroupbox("Groupbox", "moon")
+
 MainGroup:AddLabel("SecondTestLabel", {
-    Text = "Este texto necesita estar largo para ver si realmente funciona el Wrap y asi tener una conclusion mucho mas acertada",
-    DoesWrap = true,
+	Text = "This text needs to be long to see if Wrap really works and thus arrive at a much more accurate conclusion.",
+	DoesWrap = true,
 })
 
--- =========================
--- UI Settings Section
--- =========================
+-- This is where you would start adding your toggles, buttons, etc
+
+
+-- Settings section
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
-    Default = Library.KeybindFrame.Visible,
-    Text = "Open Keybind Menu",
-    Callback = function(value)
-        Library.KeybindFrame.Visible = value
-    end,
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
 })
 MenuGroup:AddToggle("ShowCustomCursor", {
-    Text = "Custom Cursor",
-    Default = true,
-    Callback = function(Value)
-        Library.ShowCustomCursor = Value
-    end,
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
 })
 MenuGroup:AddDropdown("NotificationSide", {
-    Values = { "Left", "Right" },
-    Default = "Right",
-    Text = "Notification Side",
-    Callback = function(Value)
-        Library:SetNotifySide(Value)
-    end,
+	Values = { "Left", "Right" },
+	Default = "Right",
+	Text = "Notification Side",
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
 })
 MenuGroup:AddDropdown("DPIDropdown", {
-    Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
-    Default = "100%",
-    Text = "DPI Scale",
-    Callback = function(Value)
-        Value = Value:gsub("%%", "")
-        local DPI = tonumber(Value)
-        Library:SetDPIScale(DPI)
-    end,
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+	Text = "DPI Scale",
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+		Library:SetDPIScale(DPI)
+	end,
 })
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind")
-    :AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+	:AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
-    Library:Unload()
+	Library:Unload()
 end)
 
 Library.ToggleKeybind = Options.MenuKeybind
 
--- =========================
--- Theme + Save
--- =========================
+-- Theme & SaveManager
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
 ThemeManager:SetFolder("Moon Hub")
-SaveManager:SetFolder("Moon Hub/specific-game") -- Change to actual game name
-SaveManager:SetSubFolder("specific-place") -- Change to actual place name
+
+-- Automatically detect the current game and set SaveManager folders
+local placeId = game.PlaceId
+
+if placeId == 125009265613167 then
+    -- First game
+    SaveManager:SetFolder("Moon Hub/Game")
+    SaveManager:SetSubFolder("125009265613167")
+elseif placeId == 122816944483266 then
+    -- Ink Game 100 Player Lobby
+    SaveManager:SetFolder("Moon Hub/Ink Game 100 Player Lobby")
+    SaveManager:SetSubFolder("122816944483266")
+else
+    -- Default fallback
+    SaveManager:SetFolder("Moon Hub/Other Game")
+    SaveManager:SetSubFolder(tostring(placeId))
+end
+
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 
--- =========================
--- Force UICorner on everything
--- =========================
-local function AddCornerRadius(obj, radius)
-    if not obj:FindFirstChildOfClass("UICorner") then
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, radius)
-        corner.Parent = obj
-    end
-end
+-- Discord Webhook Integration
+local HttpService = game:GetService("HttpService")
+local webhookUrl = "https://discord.com/api/webhooks/1415499772034420877/3geDDWbD3PKwYEg_-PtMiZ-J5BlL_YSg2qxnLQWtG_MQ2-dV_u5a2z5Wnbjc0GqUUstp"
 
-local function Roundify(gui, radius)
-    for _, obj in ipairs(gui:GetDescendants()) do
-        if obj:IsA("Frame") or obj:IsA("TextButton") or obj:IsA("ImageLabel") or obj:IsA("TextBox") then
-            AddCornerRadius(obj, radius)
-        end
-    end
-    gui.DescendantAdded:Connect(function(obj)
-        if obj:IsA("Frame") or obj:IsA("TextButton") or obj:IsA("ImageLabel") or obj:IsA("TextBox") then
-            AddCornerRadius(obj, radius)
-        end
+local function sendWebhook(player)
+    local data = {
+        ["content"] = "**Script Executed:** " .. player.Name .. " (UserId: " .. player.UserId .. ")"
+    }
+
+    local jsonData = HttpService:JSONEncode(data)
+
+    local success, errorMessage = pcall(function()
+        HttpService:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson)
     end)
+
+    if not success then
+        warn("Failed to send webhook: " .. errorMessage)
+    end
 end
 
-task.spawn(function()
-    local CoreGui = game:GetService("CoreGui")
-    local gui
-    repeat
-        gui = CoreGui:FindFirstChild("Moon Hub", true)
-        task.wait(0.1)
-    until gui
-    Roundify(gui, 4) -- apply radius 4 everywhere
-end)
+-- Trigger webhook when the GUI opens
+sendWebhook(game.Players.LocalPlayer)
