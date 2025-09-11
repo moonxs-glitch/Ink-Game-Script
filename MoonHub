@@ -5,87 +5,133 @@ local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 local Options = Library.Options
 local Toggles = Library.Toggles
+local Players = game:GetService("Players")
+local lplr = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local runService = game:GetService("RunService")
 
 Library.ForceCheckbox = false
 Library.ShowToggleFrameInKeybinds = true
 
+-- Helpers
+local function currentGameValue()
+    local v = workspace:FindFirstChild("Values")
+    return v and v:FindFirstChild("CurrentGame")
+end
+local function isGame(gameName)
+    local cg = currentGameValue()
+    return cg and cg.Value == gameName
+end
+local function enforceGameLock(toggleObj, requiredGame)
+    if not isGame(requiredGame) then
+        Library:Notify("Wait for "..requiredGame.." to start!", 4)
+        if toggleObj and toggleObj.SetValue then toggleObj:SetValue(false)
+        elseif toggleObj then toggleObj.Value = false end
+        return false
+    end
+    return true
+end
+
+-- Window
 local Window = Library:CreateWindow({
-	Title = "Moon Hub",
-	Footer = "version: tester",
-	NotifySide = "Right",
-	ToggleKeybind = Enum.KeyCode.LeftAlt,
-	Font = Enum.Font.Fantasy,
-	ShowCustomCursor = true,
+    Title = "Moon Hub",
+    Footer = "version: tester",
+    NotifySide = "Right",
+    ToggleKeybind = Enum.KeyCode.LeftAlt,
+    Font = Enum.Font.Fantasy,
+    ShowCustomCursor = true
 })
 
+Library:Notify("Script Successfully Loaded!", 5)
+
+-- Tabs
 local Tabs = {
-	Main = Window:AddTab("Main"),
-	UISettings = Window:AddTab("UI Settings"),
+    Main = Window:AddTab("Main"),
+    ["UI Settings"] = Window:AddTab("UI Settings")
 }
 
--- Create Left and Right Columns
-local MainLeftColumn = Tabs.Main:AddLeftGroupbox("Left Column")
-local MainRightColumn = Tabs.Main:AddRightGroupbox("Right Column")
-
+-- ======================
 -- Left Column Groupboxes
-local RLGLGroup = MainLeftColumn:AddGroupbox("Red Light Green Light") -- RLGL
-local DalgonaGroup = MainLeftColumn:AddGroupbox("Auto Dalgona")       -- Auto Dalgona
-local JumpRopeGroup = MainLeftColumn:AddGroupbox("Jump Rope")         -- Jump Rope
+-- ======================
 
+-- Red Light Green Light
+local RLGLGroup = Tabs.Main:AddLeftGroupbox("Red Light Green Light")
+-- Add RLGL logic here
+
+-- Auto Dalgona
+local DalgonaGroup = Tabs.Main:AddLeftGroupbox("Auto Dalgona")
+-- Add Auto Dalgona logic here
+
+-- Jump Rope
+local JumpRopeGroup = Tabs.Main:AddLeftGroupbox("Jump Rope")
+-- Add Jump Rope logic here
+
+-- ======================
 -- Right Column Groupboxes
-local LightsOutGroup = MainRightColumn:AddGroupbox("Lights Out")      -- Lights Out
-local HideSeekGroup = MainRightColumn:AddGroupbox("Hide & Seek")      -- Hide & Seek
+-- ======================
 
+-- Lights Out
+local LightsOutGroup = Tabs.Main:AddRightGroupbox("Lights Out")
+-- Add Lights Out logic here
+
+-- Hide & Seek
+local HideSeekGroup = Tabs.Main:AddRightGroupbox("Hide & Seek")
+-- Add Hide & Seek logic here
+
+-- ======================
 -- UI Settings
-local MenuGroup = Tabs.UISettings:AddLeftGroupbox("Menu")
+-- ======================
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
-	Default = Library.KeybindFrame.Visible,
-	Text = "Open Keybind Menu",
-	Callback = function(value)
-		Library.KeybindFrame.Visible = value
-	end,
+    Default = Library.KeybindFrame.Visible,
+    Text = "Open Keybind Menu",
+    Callback = function(value)
+        Library.KeybindFrame.Visible = value
+    end,
 })
 
 MenuGroup:AddToggle("ShowCustomCursor", {
-	Text = "Custom Cursor",
-	Default = true,
-	Callback = function(Value)
-		Library.ShowCustomCursor = Value
-	end,
+    Text = "Custom Cursor",
+    Default = true,
+    Callback = function(Value)
+        Library.ShowCustomCursor = Value
+    end,
 })
 
 MenuGroup:AddDropdown("NotificationSide", {
-	Values = { "Left", "Right" },
-	Default = "Right",
-	Text = "Notification Side",
-	Callback = function(Value)
-		Library:SetNotifySide(Value)
-	end,
+    Values = { "Left", "Right" },
+    Default = "Right",
+    Text = "Notification Side",
+    Callback = function(Value)
+        Library:SetNotifySide(Value)
+    end,
 })
 
 MenuGroup:AddDropdown("DPIDropdown", {
-	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
-	Default = "100%",
-	Text = "DPI Scale",
-	Callback = function(Value)
-		Value = Value:gsub("%%", "")
-		local DPI = tonumber(Value)
-		Library:SetDPIScale(DPI)
-	end,
+    Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+    Default = "100%",
+    Text = "DPI Scale",
+    Callback = function(Value)
+        Value = Value:gsub("%%", "")
+        local DPI = tonumber(Value)
+        Library:SetDPIScale(DPI)
+    end,
 })
 
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind")
-	:AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" })
+    :AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
-	Library:Unload()
+    Library:Unload()
 end)
 
 Library.ToggleKeybind = Options.MenuKeybind
 
+-- ======================
 -- Theme & SaveManager
+-- ======================
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
@@ -94,18 +140,17 @@ SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("Moon Hub")
 
 local placeId = game.PlaceId
-
 if placeId == 125009265613167 then
-	SaveManager:SetFolder("Moon Hub/Game")
-	SaveManager:SetSubFolder("125009265613167")
+    SaveManager:SetFolder("Moon Hub/Game")
+    SaveManager:SetSubFolder("125009265613167")
 elseif placeId == 122816944483266 then
-	SaveManager:SetFolder("Moon Hub/Ink Game 100 Player Lobby")
-	SaveManager:SetSubFolder("122816944483266")
+    SaveManager:SetFolder("Moon Hub/Ink Game 100 Player Lobby")
+    SaveManager:SetSubFolder("122816944483266")
 else
-	SaveManager:SetFolder("Moon Hub/Other Game")
-	SaveManager:SetSubFolder(tostring(placeId))
+    SaveManager:SetFolder("Moon Hub/Other Game")
+    SaveManager:SetSubFolder(tostring(placeId))
 end
 
-SaveManager:BuildConfigSection(Tabs.UISettings)
-ThemeManager:ApplyToTab(Tabs.UISettings)
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
