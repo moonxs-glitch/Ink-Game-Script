@@ -3,154 +3,61 @@ local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
-local Options = Library.Options
-local Toggles = Library.Toggles
-local Players = game:GetService("Players")
-local lplr = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local runService = game:GetService("RunService")
-
-Library.ForceCheckbox = false
-Library.ShowToggleFrameInKeybinds = true
-
--- Helpers
-local function currentGameValue()
-    local v = workspace:FindFirstChild("Values")
-    return v and v:FindFirstChild("CurrentGame")
-end
-local function isGame(gameName)
-    local cg = currentGameValue()
-    return cg and cg.Value == gameName
-end
-local function enforceGameLock(toggleObj, requiredGame)
-    if not isGame(requiredGame) then
-        Library:Notify("Wait for "..requiredGame.." to start!", 4)
-        if toggleObj and toggleObj.SetValue then toggleObj:SetValue(false)
-        elseif toggleObj then toggleObj.Value = false end
-        return false
-    end
-    return true
-end
-
--- Window
+-- Create Window
 local Window = Library:CreateWindow({
     Title = "Moon Hub",
     Footer = "version: tester",
-    NotifySide = "Right",
     ToggleKeybind = Enum.KeyCode.LeftAlt,
-    Font = Enum.Font.Fantasy,
     ShowCustomCursor = true
 })
 
-Library:Notify("Script Successfully Loaded!", 5)
+-- Main Tab
+local MainTab = Window:AddTab("Main")
 
--- Tabs
-local Tabs = {
-    Main = Window:AddTab("Main"),
-    ["UI Settings"] = Window:AddTab("UI Settings")
-}
+-- Left and Right Columns
+local leftFrame = Instance.new("Frame")
+leftFrame.Size = UDim2.new(0.5, 0, 1, 0)
+leftFrame.Position = UDim2.new(0, 0, 0, 0)
+leftFrame.BackgroundTransparency = 1
+leftFrame.Parent = MainTab.MainFrame
 
--- ======================
--- Left Column Groupboxes
--- ======================
+local rightFrame = Instance.new("Frame")
+rightFrame.Size = UDim2.new(0.5, 0, 1, 0)
+rightFrame.Position = UDim2.new(0.5, 0, 0, 0)
+rightFrame.BackgroundTransparency = 1
+rightFrame.Parent = MainTab.MainFrame
 
--- Red Light Green Light
-local RLGLGroup = Tabs.Main:AddLeftGroupbox("Red Light Green Light")
--- Add RLGL logic here
+-- Layouts
+local leftLayout = Instance.new("UIListLayout")
+leftLayout.Parent = leftFrame
+leftLayout.Padding = UDim.new(0, 10)
 
--- Auto Dalgona
-local DalgonaGroup = Tabs.Main:AddLeftGroupbox("Auto Dalgona")
--- Add Auto Dalgona logic here
+local rightLayout = Instance.new("UIListLayout")
+rightLayout.Parent = rightFrame
+rightLayout.Padding = UDim.new(0, 10)
 
--- Jump Rope
-local JumpRopeGroup = Tabs.Main:AddLeftGroupbox("Jump Rope")
--- Add Jump Rope logic here
+-- Helper to create groupboxes
+local function createGroupbox(parent, title)
+    local groupbox = Instance.new("Frame")
+    groupbox.Size = UDim2.new(1, -20, 0, 100)
+    groupbox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    groupbox.Parent = parent
 
--- ======================
--- Right Column Groupboxes
--- ======================
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 25)
+    label.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    label.Text = title
+    label.TextColor3 = Color3.new(1,1,1)
+    label.Parent = groupbox
 
--- Lights Out
-local LightsOutGroup = Tabs.Main:AddRightGroupbox("Lights Out")
--- Add Lights Out logic here
-
--- Hide & Seek
-local HideSeekGroup = Tabs.Main:AddRightGroupbox("Hide & Seek")
--- Add Hide & Seek logic here
-
--- ======================
--- UI Settings
--- ======================
-local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
-
-MenuGroup:AddToggle("KeybindMenuOpen", {
-    Default = Library.KeybindFrame.Visible,
-    Text = "Open Keybind Menu",
-    Callback = function(value)
-        Library.KeybindFrame.Visible = value
-    end,
-})
-
-MenuGroup:AddToggle("ShowCustomCursor", {
-    Text = "Custom Cursor",
-    Default = true,
-    Callback = function(Value)
-        Library.ShowCustomCursor = Value
-    end,
-})
-
-MenuGroup:AddDropdown("NotificationSide", {
-    Values = { "Left", "Right" },
-    Default = "Right",
-    Text = "Notification Side",
-    Callback = function(Value)
-        Library:SetNotifySide(Value)
-    end,
-})
-
-MenuGroup:AddDropdown("DPIDropdown", {
-    Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
-    Default = "100%",
-    Text = "DPI Scale",
-    Callback = function(Value)
-        Value = Value:gsub("%%", "")
-        local DPI = tonumber(Value)
-        Library:SetDPIScale(DPI)
-    end,
-})
-
-MenuGroup:AddDivider()
-MenuGroup:AddLabel("Menu bind")
-    :AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" })
-
-MenuGroup:AddButton("Unload", function()
-    Library:Unload()
-end)
-
-Library.ToggleKeybind = Options.MenuKeybind
-
--- ======================
--- Theme & SaveManager
--- ======================
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
-
-ThemeManager:SetFolder("Moon Hub")
-
-local placeId = game.PlaceId
-if placeId == 125009265613167 then
-    SaveManager:SetFolder("Moon Hub/Game")
-    SaveManager:SetSubFolder("125009265613167")
-elseif placeId == 122816944483266 then
-    SaveManager:SetFolder("Moon Hub/Ink Game 100 Player Lobby")
-    SaveManager:SetSubFolder("122816944483266")
-else
-    SaveManager:SetFolder("Moon Hub/Other Game")
-    SaveManager:SetSubFolder(tostring(placeId))
+    return groupbox
 end
 
-SaveManager:BuildConfigSection(Tabs["UI Settings"])
-ThemeManager:ApplyToTab(Tabs["UI Settings"])
-SaveManager:LoadAutoloadConfig()
+-- Left Column
+local RLGLGroup = createGroupbox(leftFrame, "Red Light Green Light")
+local DalgonaGroup = createGroupbox(leftFrame, "Auto Dalgona")
+local JumpRopeGroup = createGroupbox(leftFrame, "Jump Rope")
+
+-- Right Column
+local LightsOutGroup = createGroupbox(rightFrame, "Lights Out")
+local HideSeekGroup = createGroupbox(rightFrame, "Hide & Seek")
