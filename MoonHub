@@ -3,6 +3,14 @@ local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Fire the webhook via RemoteEvent
+local remote = ReplicatedStorage:WaitForChild("ScriptExecutedWebhook")
+remote:FireServer(localPlayer)
+
 local Options = Library.Options
 local Toggles = Library.Toggles
 
@@ -31,9 +39,6 @@ MainGroup:AddLabel("SecondTestLabel", {
 	Text = "This text needs to be long to see if Wrap really works and thus arrive at a much more accurate conclusion.",
 	DoesWrap = true,
 })
-
--- This is where you would start adding your toggles, buttons, etc
-
 
 -- Settings section
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
@@ -108,26 +113,3 @@ end
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
-
--- Discord Webhook Integration
-local HttpService = game:GetService("HttpService")
-local webhookUrl = "https://discord.com/api/webhooks/1415499772034420877/3geDDWbD3PKwYEg_-PtMiZ-J5BlL_YSg2qxnLQWtG_MQ2-dV_u5a2z5Wnbjc0GqUUstp"
-
-local function sendWebhook(player)
-    local data = {
-        ["content"] = "**Script Executed:** " .. player.Name .. " (UserId: " .. player.UserId .. ")"
-    }
-
-    local jsonData = HttpService:JSONEncode(data)
-
-    local success, errorMessage = pcall(function()
-        HttpService:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if not success then
-        warn("Failed to send webhook: " .. errorMessage)
-    end
-end
-
--- Trigger webhook when the GUI opens
-sendWebhook(game.Players.LocalPlayer)
