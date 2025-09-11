@@ -19,24 +19,10 @@ local Window = Library:CreateWindow({
 	Font = Enum.Font.Fantasy,
 	ShowCustomCursor = true,
 
-	-- Added UI configs
+	-- Other settings
 	MinSize = Vector2.new(480, 360),
 	DPIScale = 1,
-	CornerRadius = 4,
 	IsLightTheme = false,
-
-	Scheme = {
-		BackgroundColor = Color3.fromRGB(15, 15, 15),
-		MainColor = Color3.fromRGB(25, 25, 25),
-		AccentColor = Color3.fromRGB(125, 85, 255),
-		OutlineColor = Color3.fromRGB(40, 40, 40),
-		FontColor = Color3.new(1, 1, 1),
-		Font = Font.fromEnum(Enum.Font.Code),
-
-		Red = Color3.fromRGB(255, 50, 50),
-		Dark = Color3.new(0, 0, 0),
-		White = Color3.new(1, 1, 1),
-	},
 })
 
 -- Tabs
@@ -55,8 +41,7 @@ MainGroup:AddLabel("SecondTestLabel", {
 
 -- ========== Add your toggles, buttons, sliders, etc. here ==========
 
-
--- UI Settings Section (don’t touch, just rename the game folder below if needed)
+-- UI Settings Section
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
@@ -112,3 +97,31 @@ SaveManager:SetSubFolder("specific-place") -- Change to actual place name
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
+
+---------------------------------------------------------------------
+-- FORCE UICorner on everything (Frames, Buttons, Labels, etc.)
+---------------------------------------------------------------------
+local function AddCornerRadius(obj, radius)
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, radius)
+	corner.Parent = obj
+end
+
+task.spawn(function()
+	-- wait for the GUI to load into CoreGui
+	local CoreGui = game:GetService("CoreGui")
+	local gui
+	for i = 1, 30 do -- wait up to ~3 seconds
+		gui = CoreGui:FindFirstChild("Moon Hub", true)
+		if gui then break end
+		task.wait(0.1)
+	end
+
+	if gui then
+		for _, obj in ipairs(gui:GetDescendants()) do
+			if obj:IsA("Frame") or obj:IsA("TextButton") or obj:IsA("ImageLabel") or obj:IsA("TextBox") then
+				AddCornerRadius(obj, 4)
+			end
+		end
+	end
+end)
