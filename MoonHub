@@ -1,8 +1,10 @@
 local repo = "https://raw.githubusercontent.com/javierfabian828-maker/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 
--- UNIVERSAL ROUNDING
-Library.CornerRadius = 20  -- This makes tabs, groupboxes, buttons, dropdowns, etc., rounded
+-- Set universal corner radius BEFORE creating the window
+Library.CornerRadius = 4
+Library.ForceCheckbox = false
+Library.ShowToggleFrameInKeybinds = true
 
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
@@ -10,51 +12,29 @@ local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
-Library.ForceCheckbox = false
-Library.ShowToggleFrameInKeybinds = true
-
--- CREATE WINDOW
 local Window = Library:CreateWindow({
     Title = "Moon Hub",
     Footer = "version: tester",
-    Icon = 97007429844836, -- your logo
+    Icon = 97007429844836, -- updated logo
     NotifySide = "Right",
     ToggleKeybind = Enum.KeyCode.LeftAlt,
     Font = Enum.Font.Fantasy,
     ShowCustomCursor = true,
 })
 
--- CREATE TABS
 local Tabs = {
     Main = Window:AddTab("Main", "user", "Home"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings", "Configure your settings"),
 }
 
--- MAIN GROUPBOX
-local MainGroup = Tabs.Main:AddLeftGroupbox("Main Options")
+local MainGroup = Tabs.Main:AddLeftGroupbox("")
 
 MainGroup:AddLabel("SecondTestLabel", {
     Text = "Este texto necesita estar largo para ver si realmente funciona el Wrap y asi tener una conclusion mucho mas acertada",
     DoesWrap = true,
 })
 
--- EXAMPLE TOGGLES / BUTTONS
-MainGroup:AddToggle("ExampleToggle", {
-    Text = "Example Toggle",
-    Default = false,
-    Callback = function(value)
-        print("ExampleToggle:", value)
-    end,
-})
-
-MainGroup:AddButton({
-    Text = "Example Button",
-    Func = function()
-        print("Button clicked!")
-    end,
-})
-
--- UI SETTINGS
+-- UI Settings group
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
@@ -94,6 +74,7 @@ MenuGroup:AddDropdown("DPIDropdown", {
 })
 
 MenuGroup:AddDivider()
+
 MenuGroup:AddLabel("Menu bind")
     :AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
@@ -103,14 +84,13 @@ end)
 
 Library.ToggleKeybind = Options.MenuKeybind
 
--- APPLY THEME & SAVE MANAGER
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("Moon Hub")
-SaveManager:SetFolder("Moon Hub/specific-game") 
-SaveManager:SetSubFolder("specific-place") 
+SaveManager:SetFolder("Moon Hub/specific-game")
+SaveManager:SetSubFolder("specific-place")
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
