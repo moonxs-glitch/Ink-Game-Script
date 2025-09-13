@@ -1,1 +1,63 @@
-.
+-- Load Vape UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/UI-Libs/main/Vape.txt"))()
+local Window = Library:Window("Moon Auto Goon", Color3.fromRGB(44, 120, 224), Enum.KeyCode.RightControl)
+
+-- ===== TABS =====
+local CombatTab = Window:Tab("Combat")
+local AutoWinTab = Window:Tab("Auto-Win")
+local SettingsTab = Window:Tab("Settings")
+local MiscTab = Window:Tab("Misc")
+
+-- ===== COMBAT TAB =====
+CombatTab:Label("Combat Features")
+CombatTab:Button("Attack", function()
+    print("Attack pressed!")
+end)
+CombatTab:Toggle("Auto Attack", false, function(value)
+    print("Auto Attack: ", value)
+end)
+CombatTab:Dropdown("Weapon Select", {"Sword","Gun","Bow"}, function(value)
+    print("Selected Weapon: ", value)
+end)
+CombatTab:Colorpicker("Damage Color", Color3.fromRGB(255, 0, 0), function(color)
+    print("Damage Color: ", color)
+end)
+CombatTab:Bind("Attack Keybind", Enum.KeyCode.E, function()
+    print("Attack Key Pressed!")
+end)
+
+-- ===== AUTO-WIN TAB =====
+AutoWinTab:Label("Auto-Win Features")
+AutoWinTab:Toggle("Enable Auto-Win", false, function(value)
+    print("Auto-Win: ", value)
+end)
+AutoWinTab:Button("Start Auto-Win", function()
+    print("Auto-Win Started!")
+end)
+
+-- ===== SETTINGS TAB =====
+SettingsTab:Label("UI & Settings")
+SettingsTab:Colorpicker("Change UI Color", Color3.fromRGB(44, 120, 224), function(color)
+    Library:ChangePresetColor(color)
+end)
+SettingsTab:Toggle("Show Notifications", true, function(value)
+    print("Show Notifications: ", value)
+end)
+SettingsTab:Textbox("Enter Name", true, function(value)
+    print("Name Entered: ", value)
+end)
+
+-- ===== MISC TAB =====
+MiscTab:Label("Misc Features")
+MiscTab:Button("Do Something", function()
+    print("Misc Button Pressed!")
+end)
+MiscTab:Toggle("Enable Misc", false, function(value)
+    print("Misc Toggle: ", value)
+end)
+MiscTab:Bind("Misc Keybind", Enum.KeyCode.F, function()
+    print("Misc Key Pressed!")
+end)
+
+-- ===== NOTIFICATIONS EXAMPLE =====
+Library:Notification("Welcome!", "Moon Auto Goon loaded!", "Enjoy!")
