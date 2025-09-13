@@ -9,11 +9,14 @@ local Toggles = Library.Toggles
 Library.ForceCheckbox = false
 Library.ShowToggleFrameInKeybinds = true
 
+-- Set global corner radius
+Library.CornerRadius = 4
+
 -- Create main window
 local Window = Library:CreateWindow({
     Title = "Moon Hub",
     Footer = "version: tester",
-    Icon = 128290060711202, -- updated main UI icon
+    Icon = 128290060711202, -- main UI icon
     NotifySide = "Right",
     ToggleKeybind = Enum.KeyCode.LeftAlt,
     Font = Enum.Font.Fantasy,
