@@ -12,7 +12,7 @@ Library.ShowToggleFrameInKeybinds = true
 local Window = Library:CreateWindow({
 	Title = "Moon Hub",
 	Footer = "version: tester",
-	Icon = 97007429844836, -- updated logo here
+	Icon = 97007429844836,
 	NotifySide = "Right",
 	ToggleKeybind = Enum.KeyCode.LeftAlt,
 	Font = Enum.Font.Fantasy,
@@ -24,6 +24,7 @@ local Tabs = {
 	["UI Settings"] = Window:AddTab("UI Settings", "settings", "Configure your settings"),
 }
 
+
 local MainGroup = Tabs.Main:AddLeftGroupbox("")
 
 MainGroup:AddLabel("SecondTestLabel", {
@@ -31,7 +32,13 @@ MainGroup:AddLabel("SecondTestLabel", {
 	DoesWrap = true,
 })
 
+
+
+
 -- En este espacio es donde empezarias con tus toggles, buttons, etc
+
+
+
 
 -- Seccion de los settings (no la toques, solo cambia el nombre del juego)
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
